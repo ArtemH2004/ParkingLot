@@ -4,7 +4,7 @@ namespace ParkingLotApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public Client Client { get; set; } 
+        public int ClientId { get; set; }
+        public Client Client { get; set; }
     }
-
 }
