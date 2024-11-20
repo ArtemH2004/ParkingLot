@@ -1,0 +1,22 @@
+﻿@model ParkingLotApp.Models.LoginViewModel
+
+<div class="flex h-screen w-screen items-center justify-center">
+    <form asp-action="Login" method="post" class="py-10 px-6 bg-white gap-6 flex w-1/2 flex-col items-center rounded-3xl shadow-2xl">
+        <h1 class="text-center text-4xl font-semibold">Регистрация</h1>
+        <div>
+            <label asp-for="Email"></label>
+            <input asp-for="Email" />
+            <span asp-validation-for="Email"></span>
+        </div>
+        <div>
+            <label asp-for="Password"></label>
+            <input asp-for="Password" type="password" />
+            <span asp-validation-for="Password"></span>
+        </div>
+        <div>
+            <input asp-for="RememberMe" type="checkbox" />
+            <label asp-for="RememberMe"></label>
+        </div>
+        <button type="submit" class="blue__button">Зарегистрироваться</button>
+    </form>
+</div>

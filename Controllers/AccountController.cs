@@ -1,100 +1,72 @@
-﻿//using ParkingLotApp.Models;
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using System.Security.Claims;
-//using System.Threading.Tasks;
-//using ParkingLotApp.Data;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using ParkingLotApp.Models;
+using System.Threading.Tasks;
 
-//namespace ParkingLotApp.Controllers
-//{
-//    public class AccountController : Controller
-//    {
-//        private readonly UserManager<ApplicationUser> _userManager;
-//        private readonly SignInManager<ApplicationUser> _signInManager;
-//        private readonly ApplicationDbContext _context; 
+namespace ParkingLotApp.Controllers
+{
+    public class AccountController : Controller
+    {
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-//        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
-//        {
-//            _userManager = userManager;
-//            _signInManager = signInManager;
-//            _context = context;
-//        }
+        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+        }
 
-//        [HttpGet]
-//        public IActionResult Register() => View();
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
 
-//        [HttpPost]
-//        public async Task<IActionResult> Register(RegisterViewModel model)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-//                var result = await _userManager.CreateAsync(user, model.Password);
-//                if (result.Succeeded)
-//                {
-//                    var client = new Client
-//                    {
-//                        FirstName = model.Name,
-//                        LastName = model.Surname,
-//                        ApplicationUserId = user.Id
-//                    };
-//                    _context.Clients.Add(client);
-//                    await _context.SaveChangesAsync();
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            }
+            return View(model);
+        }
 
-//                    await _signInManager.SignInAsync(user, isPersistent: false);
-//                    return RedirectToAction("Index", "Home");
-//                }
-//                foreach (var error in result.Errors)
-//                {
-//                    ModelState.AddModelError(string.Empty, error.Description);
-//                }
-//            }
-//            return View(model);
-//        }
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
 
-//        [HttpGet]
-//        public IActionResult Login() => View();
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
 
-//        [HttpPost]
-//        public async Task<IActionResult> Login(LoginViewModel model)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-//                if (result.Succeeded)
-//                {
-//                    return RedirectToAction("Index", "Home");
-//                }
-//                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-//            }
-//            return View(model);
-//        }
-
-//        [HttpPost]
-//        public async Task<IActionResult> Logout()
-//        {
-//            await _signInManager.SignOutAsync();
-//            return RedirectToAction("Index", "Home");
-//        }
-
-//        //public IActionResult Index()
-//        //{
-//        //    var email = User.Identity.Name;
-
-//        //    var user = _userManager.Users.FirstOrDefault(u => u.Email == email);
-//        //    Client client = null;
-
-//        //    if (user != null)
-//        //    {
-//        //        client = _context.Clients.FirstOrDefault(p => p.ApplicationUserId == user.Id);
-//        //    }
-//        //    //var tickets = _context.Tickets
-//        //    //    .Where(t => t.PassengerId == passenger.PassengerId)
-//        //    //    .ToList();
-
-//        //    //return View(tickets);
-//        //}
-//    }
-
-//}
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Index", "Home");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            return View(model);
+        }
+    }
+}
