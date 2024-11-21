@@ -30,9 +30,12 @@ namespace ParkingLotApp.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("ClientPage", "Home");
                 }
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your email and password.");
+                }
             }
             return View(model);
         }
@@ -59,7 +62,7 @@ namespace ParkingLotApp.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("ClientPage", "Home");
                 }
                 foreach (var error in result.Errors)
                 {
